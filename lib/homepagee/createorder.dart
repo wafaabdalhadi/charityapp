@@ -64,6 +64,7 @@ class _OrderState extends State<Order> {
   String? order;
   String? time;
   String? date;
+  List<String>? donations;
   Future<void> addOrder() async {
     try {
       await FirebaseFirestore.instance.collection('orders').add({
@@ -79,6 +80,7 @@ class _OrderState extends State<Order> {
         'order': order,
         'time': time,
         'date': date,
+        'donations': donations,
       });
     } catch (error) {
       print(error);
@@ -601,6 +603,7 @@ class _OrderState extends State<Order> {
                                     }
                                     print('Selected items: $selectedItems');
                                     print('Item details: $itemDetails');
+                                    donations = selectedItems;
                                     addOrder();
                                     showDialog(
                                       context: context,
