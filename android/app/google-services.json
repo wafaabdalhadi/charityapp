@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "313980195738",
+    "project_id": "charityapp-ae26e",
+    "storage_bucket": "charityapp-ae26e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:313980195738:android:4d9186b1ac3b1282136023",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwmsaLZKdtYmsMYpjZTco3K6Z8T7KVSQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
