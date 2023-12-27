@@ -1,6 +1,9 @@
 // ignore_for_file: avoid_unnecessary_containers, avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_2/homepagee/homapage.dart';
 
 void main() {
   runApp(const Order1());
@@ -61,6 +64,26 @@ class _OrderState extends State<Order> {
   String? order;
   String? time;
   String? date;
+  Future<void> addOrder() async {
+    try {
+      await FirebaseFirestore.instance.collection('orders').add({
+        'email': email,
+        'pass': pass,
+        'fname': fname,
+        'sname': sname,
+        'phone': phone,
+        'province': province,
+        'address': address,
+        'bulding': bulding,
+        'apartment': apartment,
+        'order': order,
+        'time': time,
+        'date': date,
+      });
+    } catch (error) {
+      print(error);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -567,22 +590,8 @@ class _OrderState extends State<Order> {
                                 onPressed: () {
                                   if (key.currentState!.validate()) {
                                     key.currentState!.save();
-                                    print(fname);
-                                    print(sname);
-                                    print(email);
-                                    print(pass);
-                                    print(phone);
-                                    print(province);
-                                    print(address);
-                                    print(bulding);
-                                    print(apartment);
-                                    print(order);
-                                    print(date);
-                                    print(time);
-                                    print('validate');
                                     List<String> selectedItems = [];
                                     List<String> itemDetails = [];
-
                                     for (int i = 0; i < itemNames.length; i++) {
                                       if (itemChecklist[i]) {
                                         selectedItems.add(itemNames[i]);
@@ -590,15 +599,13 @@ class _OrderState extends State<Order> {
                                             .add(itemControllers[i].text);
                                       }
                                     }
-
                                     print('Selected items: $selectedItems');
                                     print('Item details: $itemDetails');
-                                  }
-                                  ;
-                                  showDialog(
+                                    addOrder();
+                                    showDialog(
                                       context: context,
                                       builder: (context) {
-                                        return const AlertDialog(
+                                        return AlertDialog(
                                           icon: Icon(Icons.done),
                                           iconColor: Colors.blue,
                                           content: Text(
@@ -606,7 +613,17 @@ class _OrderState extends State<Order> {
                                             textAlign: TextAlign.center,
                                           ),
                                         );
-                                      });
+                                      },
+                                    ).then((value) {
+                                      // Navigate to the home page
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Homepage(),
+                                        ),
+                                      );
+                                    });
+                                  }
                                 },
                                 color: const Color.fromARGB(255, 101, 163, 103),
                                 splashColor: Colors.transparent,
