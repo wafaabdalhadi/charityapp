@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_2/homepagee/homapage.dart';
+import 'package:flutter_application_2/homepagee/mainpage.dart';
 
 void main() {
   runApp(const Order1());
@@ -84,7 +85,7 @@ class _OrderState extends State<Order> {
         'time': time,
         'date': date,
         'donations': donations,
-        'userId':user.uid,
+        'userId': user.uid,
       });
     } catch (error) {
       print(error);
@@ -622,12 +623,11 @@ class _OrderState extends State<Order> {
                                         );
                                       },
                                     ).then((value) {
-                                      // Navigate to the home page
-                                      Navigator.pushReplacement(
+                                      Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => Homepage(),
-                                        ),
+                                            builder: (context) =>
+                                                const Firstpage()),
                                       );
                                     });
                                   }
