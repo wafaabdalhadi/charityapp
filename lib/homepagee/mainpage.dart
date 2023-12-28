@@ -1,4 +1,6 @@
 // ignore_for_file: avoid_unnecessary_containers, avoid_print
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/Drawwer/Howwework.dart';
@@ -14,6 +16,10 @@ import '../Drawwer/Calculatezakatt/Currency.dart';
 import '../Drawwer/Lang.dart';
 import '../Seeallpages/Charitiespages.dart';
 
+import 'package:cloud_firestore_platform_interface/src/platform_interface/platform_interface_index_definitions.dart'
+    as cloudOrder;
+import 'package:flutter_application_2/homepagee/createorder.dart' as myOrder;
+
 void main() {
   runApp(const Firstpage());
 }
@@ -23,7 +29,9 @@ class Firstpage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    dynamic user = FirebaseAuth.instance.currentUser;
+    print(user);
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Pagees(),
     );
@@ -31,6 +39,7 @@ class Firstpage extends StatelessWidget {
 }
 
 class Pagees extends StatefulWidget {
+
   const Pagees({Key? key}) : super(key: key);
 
   @override
@@ -38,8 +47,40 @@ class Pagees extends StatefulWidget {
 }
 
 class _PageesState extends State<Pagees> {
+  dynamic user = FirebaseAuth.instance.currentUser;
+  String firstName = '';
+  String userEmail = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userSnapshot = querySnapshot.docs.first;
+        setState(() {
+          firstName = userSnapshot['firstname'];
+          this.userEmail = userSnapshot['email'];
+        });
+      } else {
+        print('User not found for email: ${user.email}');
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
+
   int currentindex = 0;
-  List pagelist = [const Homepage(), const Order()];
+  List pagelist = [const Homepage(), const myOrder.Order()];
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -54,21 +95,26 @@ class _PageesState extends State<Pagees> {
               children: [
                 Container(
                   color: Colors.black,
-                  child: const UserAccountsDrawerHeader(
-                      decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 101, 163, 103),
-                      ),
-                      currentAccountPicture: CircleAvatar(),
-                      accountName: Text(
-                        'rayah',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w500),
-                      ),
-                      accountEmail: Text(
-                        'ray@gmail.com',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w500),
-                      )),
+                  child: UserAccountsDrawerHeader(
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 101, 163, 103),
+                    ),
+                    currentAccountPicture: CircleAvatar(),
+                    accountName: Text(
+                      firstName, // Display user's first name
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black),
+                    ),
+                    accountEmail: Text(
+                      userEmail, // Display user's email
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black),
+                    ),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(10),

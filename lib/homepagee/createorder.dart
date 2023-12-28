@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_unnecessary_containers, avoid_print
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -66,6 +67,8 @@ class _OrderState extends State<Order> {
   String? date;
   List<String>? donations;
   Future<void> addOrder() async {
+    dynamic user = FirebaseAuth.instance.currentUser;
+    print(user);
     try {
       await FirebaseFirestore.instance.collection('orders').add({
         'email': email,
@@ -81,6 +84,7 @@ class _OrderState extends State<Order> {
         'time': time,
         'date': date,
         'donations': donations,
+        'userId':user.uid,
       });
     } catch (error) {
       print(error);
