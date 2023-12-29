@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_unnecessary_containers, avoid_print
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/homepagee/mainpage.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -32,7 +34,7 @@ class _Ratepage1State extends State<Ratepage1> {
 
   GlobalKey<FormState> key = GlobalKey<FormState>();
   String? comment;
-
+  double rating = 0.0;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -103,6 +105,7 @@ class _Ratepage1State extends State<Ratepage1> {
                           print(comment);
 
                           print('validate');
+                          saveRatingAndReview();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -153,9 +156,33 @@ class _Ratepage1State extends State<Ratepage1> {
         Icons.star,
         color: Colors.amber,
       ),
-      onRatingUpdate: (rating) {
-        print(rating);
+      onRatingUpdate: (newRating) {
+        setState(() {
+          rating = newRating;
+        });
       },
     );
+  }
+
+  Future<void> saveRatingAndReview() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      CollectionReference reviews =
+      FirebaseFirestore.instance.collection('reviews');
+
+      Map<String, dynamic> data = {
+        'userId': user.uid,
+        'email': user.email,
+        'rating': rating,
+        'review': comment,
+      };
+      try {
+        await reviews.add(data);
+        print(reviews);
+      } catch (e) {
+        print(e);
+      }
+    }
   }
 }

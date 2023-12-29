@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_unnecessary_containers, avoid_print
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/Loginpage/main.dart';
 
@@ -27,6 +29,10 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   TextEditingController emailcontroller = TextEditingController();
   TextEditingController passcontroller = TextEditingController();
   TextEditingController fnamecontroller = TextEditingController();
@@ -48,6 +54,70 @@ class _SignupState extends State<Signup> {
   String? address;
   String? bulding;
   String? apartment;
+
+  Future<void> saveUserDataToFirestore(String userId) async {
+    try {
+      await _firestore.collection('users').doc(userId).set({
+        'firstname': fname!,
+        'lastname': sname!,
+        'email': email!,
+        'password': pass!,
+        'phone': phone!,
+        'province': province!,
+        'build': bulding!,
+        'address': address!,
+        'aprtnum': int.parse(apartment!),
+        'uid': userId,
+      });
+      print('User data saved to Firestore successfully!');
+    } catch (e) {
+      print('Error saving user data to Firestore: $e');
+    }
+  }
+
+  Future<void> signUpWithEmailAndPassword() async {
+    try {
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email!,
+        password: pass!,
+      );
+      User? U = userCredential.user;
+
+      if (userCredential.user != null) {
+        await saveUserDataToFirestore(userCredential.user!.uid);
+
+        print('User signed up successfully!');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Loginpage1()),
+        );
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+    }
+  }
+  // Future<void> signUpWithEmailAndPassword() async {
+  //   try {
+  //     UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+  //       email: email!,
+  //       password: pass!,
+  //     );
+  //     // If sign-up is successful
+  //     if (userCredential.user != null) {
+  //       // Navigate to another screen or do something else
+  //       print('User signed up successfully!');
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => const Loginpage1()),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     // Handle errors
+  //     print('Error occurred: $e');
+  //     // TODO: Show appropriate error message to the user
+  //   }
+  // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -437,6 +507,8 @@ class _SignupState extends State<Signup> {
                                 onPressed: () {
                                   if (key.currentState!.validate()) {
                                     key.currentState!.save();
+
+                                    // Print the values for debugging
                                     print(fname);
                                     print(sname);
                                     print(email);
@@ -447,23 +519,21 @@ class _SignupState extends State<Signup> {
                                     print(bulding);
                                     print(apartment);
                                     print('validate');
+
+                                    // Call the sign-up function
+                                    signUpWithEmailAndPassword();
+
+                                    // Navigate to the login page after successful signup
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              const Loginpage1()),
+                                        builder: (context) => const Loginpage1(),
+                                      ),
                                     );
                                   }
                                 },
-                                color: const Color.fromARGB(255, 101, 163, 103),
-                                splashColor: Colors.transparent,
-                                child: const Text(
-                                  'Sign up',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              )
+                                child: const Text('Sign Up'),  // Add a child widget if needed
+                              ),
                             ],
                           )),
                     ],

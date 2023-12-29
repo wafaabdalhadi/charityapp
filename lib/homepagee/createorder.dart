@@ -1,6 +1,11 @@
 // ignore_for_file: avoid_unnecessary_containers, avoid_print
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_2/homepagee/homapage.dart';
+import 'package:flutter_application_2/homepagee/mainpage.dart';
 
 void main() {
   runApp(const Order1());
@@ -61,6 +66,31 @@ class _OrderState extends State<Order> {
   String? order;
   String? time;
   String? date;
+  List<String>? donations;
+  Future<void> addOrder() async {
+    dynamic user = FirebaseAuth.instance.currentUser;
+    print(user);
+    try {
+      await FirebaseFirestore.instance.collection('orders').add({
+        'email': email,
+        'pass': pass,
+        'fname': fname,
+        'sname': sname,
+        'phone': phone,
+        'province': province,
+        'address': address,
+        'bulding': bulding,
+        'apartment': apartment,
+        'order': order,
+        'time': time,
+        'date': date,
+        'donations': donations,
+        'userId': user.uid,
+      });
+    } catch (error) {
+      print(error);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +152,7 @@ class _OrderState extends State<Order> {
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                          BorderRadius.circular(20),
                                           borderSide: const BorderSide(
                                               color: Colors.grey)),
                                       label: const Text(
@@ -156,7 +186,7 @@ class _OrderState extends State<Order> {
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                          BorderRadius.circular(20),
                                           borderSide: const BorderSide(
                                               color: Colors.grey)),
                                       label: const Text(
@@ -190,7 +220,7 @@ class _OrderState extends State<Order> {
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                          BorderRadius.circular(20),
                                           borderSide: const BorderSide(
                                               color: Colors.grey)),
                                       prefixIcon: const Icon(
@@ -226,7 +256,7 @@ class _OrderState extends State<Order> {
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                          BorderRadius.circular(20),
                                           borderSide: const BorderSide(
                                               color: Colors.grey)),
                                       label: const Text(
@@ -271,7 +301,7 @@ class _OrderState extends State<Order> {
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(20),
                                       borderSide:
-                                          const BorderSide(color: Colors.grey),
+                                      const BorderSide(color: Colors.grey),
                                     ),
                                     prefixIcon: const Icon(
                                       Icons.map,
@@ -302,7 +332,7 @@ class _OrderState extends State<Order> {
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                          BorderRadius.circular(20),
                                           borderSide: const BorderSide(
                                               color: Colors.grey)),
                                       label: const Text(
@@ -336,7 +366,7 @@ class _OrderState extends State<Order> {
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                          BorderRadius.circular(20),
                                           borderSide: const BorderSide(
                                               color: Colors.grey)),
                                       label: const Text(
@@ -370,7 +400,7 @@ class _OrderState extends State<Order> {
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                          BorderRadius.circular(20),
                                           borderSide: const BorderSide(
                                               color: Colors.grey)),
                                       label: const Text(
@@ -382,7 +412,7 @@ class _OrderState extends State<Order> {
                                         color: Colors.black,
                                       ),
                                       hintText:
-                                          'Enter your apartment number..'),
+                                      'Enter your apartment number..'),
                                 ),
                               ),
                               const SizedBox(
@@ -416,7 +446,7 @@ class _OrderState extends State<Order> {
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(20),
                                       borderSide:
-                                          const BorderSide(color: Colors.grey),
+                                      const BorderSide(color: Colors.grey),
                                     ),
                                     prefixIcon: const Icon(
                                       Icons.shopping_cart,
@@ -439,8 +469,8 @@ class _OrderState extends State<Order> {
                               ),
                               const SizedBox(height: 10),
                               for (int index = 0;
-                                  index < itemNames.length;
-                                  index++)
+                              index < itemNames.length;
+                              index++)
                                 Column(
                                   children: [
                                     CheckboxListTile(
@@ -468,14 +498,14 @@ class _OrderState extends State<Order> {
                                           decoration: InputDecoration(
                                             border: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(20),
+                                              BorderRadius.circular(20),
                                               borderSide: const BorderSide(
                                                   color: Colors.grey),
                                             ),
                                             label: Text(
                                                 'Details for ${itemNames[index]}'),
                                             hintText:
-                                                'Enter details for ${itemNames[index]}..',
+                                            'Enter details for ${itemNames[index]}..',
                                           ),
                                         ),
                                       ),
@@ -512,7 +542,7 @@ class _OrderState extends State<Order> {
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                          BorderRadius.circular(20),
                                           borderSide: const BorderSide(
                                               color: Colors.grey)),
                                       label: const Text(
@@ -546,7 +576,7 @@ class _OrderState extends State<Order> {
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                          BorderRadius.circular(20),
                                           borderSide: const BorderSide(
                                               color: Colors.grey)),
                                       label: const Text(
@@ -567,22 +597,8 @@ class _OrderState extends State<Order> {
                                 onPressed: () {
                                   if (key.currentState!.validate()) {
                                     key.currentState!.save();
-                                    print(fname);
-                                    print(sname);
-                                    print(email);
-                                    print(pass);
-                                    print(phone);
-                                    print(province);
-                                    print(address);
-                                    print(bulding);
-                                    print(apartment);
-                                    print(order);
-                                    print(date);
-                                    print(time);
-                                    print('validate');
                                     List<String> selectedItems = [];
                                     List<String> itemDetails = [];
-
                                     for (int i = 0; i < itemNames.length; i++) {
                                       if (itemChecklist[i]) {
                                         selectedItems.add(itemNames[i]);
@@ -590,15 +606,14 @@ class _OrderState extends State<Order> {
                                             .add(itemControllers[i].text);
                                       }
                                     }
-
                                     print('Selected items: $selectedItems');
                                     print('Item details: $itemDetails');
-                                  }
-                                  ;
-                                  showDialog(
+                                    donations = selectedItems;
+                                    addOrder();
+                                    showDialog(
                                       context: context,
                                       builder: (context) {
-                                        return const AlertDialog(
+                                        return AlertDialog(
                                           icon: Icon(Icons.done),
                                           iconColor: Colors.blue,
                                           content: Text(
@@ -606,7 +621,16 @@ class _OrderState extends State<Order> {
                                             textAlign: TextAlign.center,
                                           ),
                                         );
-                                      });
+                                      },
+                                    ).then((value) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                            const Firstpage()),
+                                      );
+                                    });
+                                  }
                                 },
                                 color: const Color.fromARGB(255, 101, 163, 103),
                                 splashColor: Colors.transparent,

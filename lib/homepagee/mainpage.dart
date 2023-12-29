@@ -1,4 +1,6 @@
 // ignore_for_file: avoid_unnecessary_containers, avoid_print
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/Drawwer/Howwework.dart';
@@ -14,6 +16,10 @@ import '../Drawwer/Calculatezakatt/Currency.dart';
 import '../Drawwer/Lang.dart';
 import '../Seeallpages/Charitiespages.dart';
 
+import 'package:cloud_firestore_platform_interface/src/platform_interface/platform_interface_index_definitions.dart'
+as cloudOrder;
+import 'package:flutter_application_2/homepagee/createorder.dart' as myOrder;
+
 void main() {
   runApp(const Firstpage());
 }
@@ -23,7 +29,9 @@ class Firstpage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    dynamic user = FirebaseAuth.instance.currentUser;
+    print(user);
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Pagees(),
     );
@@ -38,8 +46,43 @@ class Pagees extends StatefulWidget {
 }
 
 class _PageesState extends State<Pagees> {
+  dynamic user = FirebaseAuth.instance.currentUser;
+  String firstName = '';
+  String userEmail = '';
+  Color? randomColor;
+  String? firstLetter;
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userSnapshot = querySnapshot.docs.first;
+        setState(() {
+          firstName = userSnapshot['firstname'];
+          randomColor = _generateRandomColor(firstName);
+          this.userEmail = userSnapshot['email'];
+
+        });
+      } else {
+        print('User not found for email: ${user.email}');
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
+
   int currentindex = 0;
-  List pagelist = [const Homepage(), const Order()];
+  List pagelist = [const Homepage(), const myOrder.Order()];
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -50,25 +93,40 @@ class _PageesState extends State<Pagees> {
           width: 250,
           elevation: 30,
           child: Container(
-            child: Column(
+            child: ListView(
               children: [
                 Container(
                   color: Colors.black,
-                  child: const UserAccountsDrawerHeader(
-                      decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 101, 163, 103),
-                      ),
-                      currentAccountPicture: CircleAvatar(),
-                      accountName: Text(
-                        'rayah',
+                  child: UserAccountsDrawerHeader(
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 101, 163, 103),
+                    ),
+                    currentAccountPicture: CircleAvatar(
+                      backgroundColor: randomColor,
+                      child: Text(
+                        '${firstName.isNotEmpty ? firstName[0].toUpperCase() : ''}',
                         style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w500),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.0,
+                        ),
                       ),
-                      accountEmail: Text(
-                        'ray@gmail.com',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w500),
-                      )),
+                    ),
+                    accountName: Text(
+                      firstName, // Display user's first name
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black),
+                    ),
+                    accountEmail: Text(
+                      userEmail, // Display user's email
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black),
+                    ),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(10),
@@ -108,7 +166,7 @@ class _PageesState extends State<Pagees> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          const Charitypage1()),
+                                      const Charitypage1()),
                                 );
                                 print('charity');
                               });
@@ -250,14 +308,16 @@ class _PageesState extends State<Pagees> {
                         children: [
                           const Icon(Icons.logout),
                           MaterialButton(
-                            onPressed: () {
+                            onPressed: () async {
+                              await FirebaseAuth.instance.signOut();
+
                               setState(() {
                                 print('out');
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          const Loadingouut()),
+                                      const Loadingouut()),
                                 );
                               });
                             },
@@ -311,5 +371,13 @@ class _PageesState extends State<Pagees> {
         body: pagelist[currentindex],
       ),
     );
+  }
+
+  Color _generateRandomColor(String seed) {
+    // Use the user's name to seed the random color generation
+    int hash = seed.hashCode;
+
+    // Generate a color based on the hash value
+    return Color(hash & 0xFFFFFF).withOpacity(1.0);
   }
 }

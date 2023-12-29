@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_unnecessary_containers, avoid_print
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/AdminCharity/manageorder.dart';
 
@@ -22,6 +23,7 @@ class admin extends StatelessWidget {
 }
 
 class admin1 extends StatefulWidget {
+
   const admin1({super.key});
 
   @override
@@ -36,6 +38,60 @@ class _admin1State extends State<admin1> {
 
   String? info;
   String? driver;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTotalUsers();
+    _fetchTotalOrders();
+    _fetchTotalFeedback();
+  }
+
+  dynamic totalUsers = 0;
+  dynamic totalOrders = 0;
+  dynamic totalFeedback = 0;
+
+  Future<void> _fetchTotalUsers() async {
+    try {
+      QuerySnapshot usersSnapshot = await FirebaseFirestore.instance
+          .collection('users') // Assuming 'users' is your collection name
+          .get();
+
+      setState(() {
+        totalUsers = usersSnapshot.size; // Get the number of documents
+      });
+    } catch (e) {
+      print('Error fetching total users: $e');
+    }
+  }
+
+  Future<void> _fetchTotalOrders() async {
+    try {
+      QuerySnapshot ordersSnapshot = await FirebaseFirestore.instance
+          .collection('orders')
+          .get();
+
+      setState(() {
+        totalOrders = ordersSnapshot.size;
+      });
+    } catch (e) {
+      print('Error fetching total orders: $e');
+    }
+  }
+
+  Future<void> _fetchTotalFeedback() async {
+    try {
+      QuerySnapshot feedbackSnapshot = await FirebaseFirestore.instance
+          .collection('reviews')  // Assuming 'reviews' is your collection name
+          .get();
+
+      setState(() {
+        totalFeedback = feedbackSnapshot.size;  // Get the number of documents
+      });
+    } catch (e) {
+      print('Error fetching total feedback: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +142,7 @@ class _admin1State extends State<admin1> {
                         alignment: Alignment.topLeft,
                         width: double.infinity,
                         height: 30,
-                        child: const Row(
+                        child: Row(
                           children: [
                             Text(
                               '  Total User :',
@@ -94,11 +150,8 @@ class _admin1State extends State<admin1> {
                                   fontSize: 15, fontWeight: FontWeight.w600),
                             ),
                             Text(
-                              '1',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.red),
+                              totalUsers.toString(),
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.red),
                             ),
                           ],
                         ),
@@ -110,7 +163,7 @@ class _admin1State extends State<admin1> {
                         alignment: Alignment.topLeft,
                         width: double.infinity,
                         height: 30,
-                        child: const Row(
+                        child: Row(
                           children: [
                             Text(
                               '  Total order :',
@@ -118,7 +171,7 @@ class _admin1State extends State<admin1> {
                                   fontSize: 15, fontWeight: FontWeight.w600),
                             ),
                             Text(
-                              '1',
+                              totalOrders.toString(),
                               style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
@@ -144,7 +197,7 @@ class _admin1State extends State<admin1> {
                         alignment: Alignment.topLeft,
                         width: double.infinity,
                         height: 30,
-                        child: const Row(
+                        child: Row(
                           children: [
                             Text(
                               '  Total feedback :',
@@ -152,7 +205,7 @@ class _admin1State extends State<admin1> {
                                   fontSize: 15, fontWeight: FontWeight.w600),
                             ),
                             Text(
-                              '1',
+                              totalFeedback.toString(),
                               style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
