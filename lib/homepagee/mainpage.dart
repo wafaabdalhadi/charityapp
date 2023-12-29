@@ -39,7 +39,6 @@ class Firstpage extends StatelessWidget {
 }
 
 class Pagees extends StatefulWidget {
-
   const Pagees({Key? key}) : super(key: key);
 
   @override
@@ -50,7 +49,8 @@ class _PageesState extends State<Pagees> {
   dynamic user = FirebaseAuth.instance.currentUser;
   String firstName = '';
   String userEmail = '';
-
+  Color? randomColor;
+  String? firstLetter;
   @override
   void initState() {
     super.initState();
@@ -68,7 +68,9 @@ class _PageesState extends State<Pagees> {
         DocumentSnapshot userSnapshot = querySnapshot.docs.first;
         setState(() {
           firstName = userSnapshot['firstname'];
+          randomColor = _generateRandomColor(firstName);
           this.userEmail = userSnapshot['email'];
+
         });
       } else {
         print('User not found for email: ${user.email}');
@@ -91,7 +93,7 @@ class _PageesState extends State<Pagees> {
           width: 250,
           elevation: 30,
           child: Container(
-            child: Column(
+            child: ListView(
               children: [
                 Container(
                   color: Colors.black,
@@ -99,7 +101,17 @@ class _PageesState extends State<Pagees> {
                     decoration: BoxDecoration(
                       color: Color.fromARGB(255, 101, 163, 103),
                     ),
-                    currentAccountPicture: CircleAvatar(),
+                    currentAccountPicture: CircleAvatar(
+                      backgroundColor: randomColor,
+                      child: Text(
+                        '${firstName.isNotEmpty ? firstName[0].toUpperCase() : ''}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.0,
+                        ),
+                      ),
+                    ),
                     accountName: Text(
                       firstName, // Display user's first name
                       style: TextStyle(
@@ -296,7 +308,9 @@ class _PageesState extends State<Pagees> {
                         children: [
                           const Icon(Icons.logout),
                           MaterialButton(
-                            onPressed: () {
+                            onPressed: () async {
+                              await FirebaseAuth.instance.signOut();
+
                               setState(() {
                                 print('out');
                                 Navigator.push(
@@ -357,5 +371,13 @@ class _PageesState extends State<Pagees> {
         body: pagelist[currentindex],
       ),
     );
+  }
+
+  Color _generateRandomColor(String seed) {
+    // Use the user's name to seed the random color generation
+    int hash = seed.hashCode;
+
+    // Generate a color based on the hash value
+    return Color(hash & 0xFFFFFF).withOpacity(1.0);
   }
 }
